@@ -254,8 +254,8 @@ Using the dataset `kingco_homes` and the operations we learned, especially pipe 
 
 # 1-3
 bellevue_homes <- kingco_homes %>%
-  filter(city == "BELLEVUE") %>%
   select(pinx, city, land_val, imp_val, sqft, view_lakewash, view_lakesamm) %>%
+  filter(city == "BELLEVUE") %>%
   mutate(total_val = land_val + imp_val)
 #print(bellevue_homes)
 
@@ -283,7 +283,7 @@ print(paste("For the total value in Bellevue the mean value is:", mean_total_val
 mean_dif <- mean_total_val_lakeview - mean_total_val_bellevue
 print(paste("The properties with a lakeview has a", mean_dif, "$ higer mean price"))
 var_dif <- var_total_val_bellevue - var_total_val_lakeview
-print(paste0("The differnece in variance is ", mean_dif, ", with the variance for all homes in Bellevue being higher, as expected"))
+print(paste0("The differnece in variance is ", mean_dif, ", with the variance for all homes in Bellevue being higher, as expected (more rows)"))
  
 ```
 
@@ -541,8 +541,26 @@ abline(v = sale_price_mean, col = "red", lwd = 2)
 
 Repeat the process with smaller sample size, such as `n = 10`, and smaller repeating time, such as 200. What did you find? What interpretation can you give for the central limit theorem from your simulation results?
 
+-   The more samples we draw the better we can better the distribution can be approximated with normal distribution, less samples means that the histogram will look less like a normal distribution.
+
 ```{r}
-# TODO
+
+set.seed(79)
+sample_means <- replicate(
+  200,  # we repeat the process (sample -> sample mean -> record) for 1000 times
+  bellevue_after2020 %>%
+    sample_n(10, replace = TRUE) %>% 
+    summarise(avg_price = mean(sale_price)) %>%
+    pull(avg_price)
+)
+
+hist(
+  sample_means,
+  breaks = 50,
+  main = "Sampling Distribution of Mean Sale Price (n = 200)",
+  xlab = "Sample Mean Sale Price (USD)"
+)
+abline(v = sale_price_mean, col = "red", lwd = 2)
 ```
 
 ### 📚 TODO: Explore More
@@ -565,8 +583,43 @@ So far, we've learned a lots functions, please use as many as possible to explor
 -   joins (`inner_join`, `left_join`, `right_join`, `full_join`) – combine datasets
 -   `distinct()` and `slice_max()` – handle duplicates
 
+-   Results: a metric conversion with rounded numbers for viability showing the five extremes. Interestingly, the biggest and smallest homes have somewhat comparable prices per area.
+
+-   It is not linear, meaning as we would know that there are other factors than size playing in for the value of a home in Seattle.
+
 ```{r}
-# TODO
+
+seattle_summary <- kingco_homes %>%
+  filter(city == "SEATTLE" & sqft > 0) %>%
+  select(land_val, imp_val, sqft) %>%
+  mutate(
+    total_val = land_val + imp_val,
+    m2 = round(sqft / 10.76, 0),
+    `$ft2` = round(total_val / sqft, 0),
+    `$m2` = round(total_val / m2, 0)
+  ) %>%
+  filter(`$ft2` > 0 & `$m2` > 0) %>%
+  rename(ft2 = sqft) %>%
+  arrange(desc(m2)) %>%
+  select(-land_val, -imp_val, -total_val)
+
+sale_price_mean <- mean(seattle_summary$`$m2`, na.rm = TRUE)
+
+hist(
+  seattle_summary$`$m2`,
+  breaks = 1000,
+  main = "Histogram of Seattle Prices per m2",
+  xlab = "Price per m2 (USD)"
+)
+abline(v = sale_price_mean, col = "red", lwd = 2)
+
+combined <- bind_rows(
+  head(seattle_summary, 5),
+  tail(seattle_summary, 5)
+)
+
+print(combined)
+  
 ```
 
 ### 📚 TODO: Using GitHub
