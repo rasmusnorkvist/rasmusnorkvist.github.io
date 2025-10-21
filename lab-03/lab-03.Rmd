@@ -539,7 +539,7 @@ head(nmbd, 3)
 nmbd_wa <- nmbd %>% filter(GEONAME == "Washington")
 nmbd_us <- nmbd %>% filter(GEONAME != "Washington")
 
-stats_wa <- nmbd_wa %>%
+summary_wa <- nmbd_wa %>%
   summarise(
     mean = mean(VALUE1, na.rm = TRUE),
     median = median(VALUE1, na.rm = TRUE),
@@ -549,7 +549,7 @@ stats_wa <- nmbd_wa %>%
     procentile_75 = quantile(VALUE2, 0.75, na.rm = TRUE)
   )
 
-stats_us <- nmbd_us %>%
+summary_us <- nmbd_us %>%
   summarise(
     mean = mean(VALUE1, na.rm = TRUE),
     median = median(VALUE1, na.rm = TRUE),
@@ -573,7 +573,6 @@ dim(nmbd)       # before (rows and columns)
 dim(nmbd_wide)  # after (rows and columns)
 ```
 
-
 ```{r}
 
 ggplot(nmbd %>% filter(GEONAME %in% c("Washington", "California"),VALUE1>100),
@@ -584,6 +583,7 @@ ggplot(nmbd %>% filter(GEONAME %in% c("Washington", "California"),VALUE1>100),
   theme_minimal()
 
 ```
+
 ```{r}
 
 ggplot(nmbd %>% filter(GEONAME %in% c("Alaska", "Texas"),VALUE2>100),
@@ -610,11 +610,10 @@ nmbd %>%
   theme_minimal()
 
 ```
-4. The results:
 
-The first histogram compares the number of mortgages between California and Washington, showing that both states have most of their counties clustered at lower mortgage counts, though Washington has a wider spread and some high-value outliers.The second histogram displays the distribution of outstanding mortgage values for Alaska and Texas, indicating that while most values are concentrated at around 750, Texas exhibits a broader range of mortgage values compared to Alaska. 
+4.  The results:
 
-The final line chart tracks the total mortgage value per year in Alaska, revealing how mortgage values have changed, grouped by year. The general trend is going up, and could probably be explained by inflation and genral price increse. The interesting part here is that it might seem that a big dip has happened in 2025, but it can probably mostly be explianed by the fact that not all data has been collected for that year. Since it is not yet over and it takes some time to update. These charts illustrate differences in mortgage volume and value distribution across differnet states.
+The first histogram compares the number of mortgages between California and Washington, showing that both states have most of their counties clustered at lower mortgage counts, though Washington has a wider spread and some high-value outliers.The second histogram displays the distribution of outstanding mortgage values for Alaska and Texas, indicating that while most values are concentrated at around 750, Texas exhibits a broader range of mortgage values compared to Alaska. The final line chart tracks the total mortgage value per year in Alaska, revealing how mortgage values have changed, grouped by year. The general trend is going up, and could probably be explained by inflation and genral price increse. The interesting part here is that it might seem that a big dip has happened in 2025, but it can probably mostly be explianed by the fact that not all data has been collected for that year. Since it is not yet over and it takes some time to update. These charts illustrate differences in mortgage volume and value distribution across differnet states.
 
 ## Acknowledgement
 
